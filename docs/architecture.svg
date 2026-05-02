@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 900" role="img" aria-labelledby="title desc">
+  <title id="title">Xray-core architecture overview</title>
+  <desc id="desc">High-level diagram of Xray-core showing startup, config loading, the core instance, features, inbound and outbound proxies, routing, transport layers, and shared modules.</desc>
+  <defs>
+    <style>
+      .bg { fill: #0f172a; }
+      .panel { fill: #111827; stroke: #334155; stroke-width: 2; rx: 18; ry: 18; }
+      .box { stroke-width: 2; rx: 14; ry: 14; }
+      .title { fill: #e5e7eb; font: 700 30px "Segoe UI", Arial, sans-serif; }
+      .subtitle { fill: #94a3b8; font: 400 16px "Segoe UI", Arial, sans-serif; }
+      .heading { fill: #f8fafc; font: 700 20px "Segoe UI", Arial, sans-serif; }
+      .text { fill: #dbe4ee; font: 400 15px "Segoe UI", Arial, sans-serif; }
+      .small { fill: #cbd5e1; font: 400 14px "Segoe UI", Arial, sans-serif; }
+      .label { fill: #0f172a; font: 700 13px "Segoe UI", Arial, sans-serif; }
+      .arrow { fill: none; stroke: #94a3b8; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrowhead); }
+      .guide { fill: none; stroke: #475569; stroke-width: 2; stroke-dasharray: 8 8; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1280" height="900"/>
+  <rect class="panel" x="30" y="30" width="1220" height="840"/>
+
+  <text class="title" x="60" y="78">Xray-core architecture overview</text>
+  <text class="subtitle" x="60" y="108">Startup loads config files, builds a core instance, wires features, then routes inbound traffic to outbound handlers over pluggable transports.</text>
+
+  <rect class="box" x="60" y="150" width="250" height="160" fill="#1d4ed8" stroke="#60a5fa"/>
+  <text class="heading" x="84" y="185">1. Startup &amp; CLI</text>
+  <text class="text" x="84" y="220">main/main.go</text>
+  <text class="text" x="84" y="246">main/run.go</text>
+  <text class="small" x="84" y="278">• parse flags</text>
+  <text class="small" x="84" y="300">• pick config files / confdir</text>
+
+  <rect class="box" x="360" y="150" width="250" height="160" fill="#0f766e" stroke="#5eead4"/>
+  <text class="heading" x="384" y="185">2. Config loading</text>
+  <text class="text" x="384" y="220">core/config.go</text>
+  <text class="small" x="384" y="252">JSON / YAML / TOML / Protobuf</text>
+  <text class="small" x="384" y="278">merge files into core.Config</text>
+  <text class="small" x="384" y="300">via infra/conf + confloader</text>
+
+  <rect class="box" x="660" y="150" width="270" height="160" fill="#7c3aed" stroke="#c4b5fd"/>
+  <text class="heading" x="684" y="185">3. Core instance</text>
+  <text class="text" x="684" y="220">core.New(config)</text>
+  <text class="text" x="684" y="246">core/xray.go</text>
+  <text class="small" x="684" y="278">• create server instance</text>
+  <text class="small" x="684" y="300">• register features + handlers</text>
+
+  <rect class="box" x="980" y="150" width="220" height="160" fill="#9a3412" stroke="#fdba74"/>
+  <text class="heading" x="1004" y="185">4. Runtime</text>
+  <text class="text" x="1004" y="220">server.Start()</text>
+  <text class="small" x="1004" y="252">start services, listen,</text>
+  <text class="small" x="1004" y="274">handle signals, shutdown</text>
+
+  <path class="arrow" d="M 310 230 H 360"/>
+  <path class="arrow" d="M 610 230 H 660"/>
+  <path class="arrow" d="M 930 230 H 980"/>
+
+  <rect class="box" x="60" y="380" width="260" height="260" fill="#1e293b" stroke="#64748b"/>
+  <text class="heading" x="84" y="415">Apps / features</text>
+  <text class="small" x="84" y="448">Optional modules created from config.App:</text>
+  <text class="small" x="84" y="480">• dispatcher    • router</text>
+  <text class="small" x="84" y="506">• dns           • policy</text>
+  <text class="small" x="84" y="532">• stats         • metrics</text>
+  <text class="small" x="84" y="558">• commander     • observatory</text>
+  <text class="small" x="84" y="584">• proxyman      • reverse</text>
+  <text class="small" x="84" y="610">Core also installs defaults for</text>
+  <text class="small" x="84" y="632">DNS, policy, router, and stats.</text>
+
+  <rect class="box" x="360" y="380" width="230" height="260" fill="#1d4ed8" stroke="#93c5fd"/>
+  <text class="heading" x="384" y="415">Inbound handlers</text>
+  <text class="small" x="384" y="448">Configured listeners and protocol servers:</text>
+  <text class="small" x="384" y="480">• SOCKS / HTTP / Dokodemo</text>
+  <text class="small" x="384" y="506">• Shadowsocks / VMess / VLESS</text>
+  <text class="small" x="384" y="532">• Trojan / DNS</text>
+  <text class="small" x="384" y="558">• WireGuard / TUN</text>
+  <text class="small" x="384" y="610">Managed by features/inbound.</text>
+
+  <rect class="box" x="625" y="380" width="250" height="260" fill="#0f766e" stroke="#99f6e4"/>
+  <text class="heading" x="649" y="415">Routing &amp; dispatch</text>
+  <text class="small" x="649" y="448">Traffic path inside the instance:</text>
+  <text class="small" x="649" y="480">Inbound → router → dispatcher</text>
+  <text class="small" x="649" y="506">→ selected outbound</text>
+  <text class="small" x="649" y="558">Rules can use domains, GeoIP,</text>
+  <text class="small" x="649" y="580">protocol metadata, and balancers.</text>
+
+  <rect class="box" x="910" y="380" width="290" height="260" fill="#7c3aed" stroke="#ddd6fe"/>
+  <text class="heading" x="934" y="415">Outbound handlers</text>
+  <text class="small" x="934" y="448">Protocol clients and egress behavior:</text>
+  <text class="small" x="934" y="480">• Freedom / Blackhole / DNS</text>
+  <text class="small" x="934" y="506">• SOCKS / HTTP / Shadowsocks</text>
+  <text class="small" x="934" y="532">• VMess / VLESS / Trojan</text>
+  <text class="small" x="934" y="558">• Hysteria / WireGuard</text>
+  <text class="small" x="934" y="610">Managed by features/outbound.</text>
+
+  <path class="guide" d="M 190 330 V 380"/>
+  <path class="guide" d="M 795 330 V 380"/>
+  <path class="arrow" d="M 590 510 H 625"/>
+  <path class="arrow" d="M 875 510 H 910"/>
+
+  <rect class="box" x="60" y="690" width="1140" height="130" fill="#111827" stroke="#475569"/>
+  <text class="heading" x="84" y="726">Transport and shared foundations</text>
+  <text class="small" x="84" y="758">Transport: TCP, UDP, KCP, gRPC, WebSocket, HTTP, HTTP Upgrade, SplitHTTP, TLS, REALITY, Hysteria</text>
+  <text class="small" x="84" y="786">Shared modules: common/ utilities, infra/ config builders, features/ interfaces, proxy/ protocol implementations</text>
+
+  <path class="guide" d="M 475 640 V 690"/>
+  <path class="guide" d="M 760 640 V 690"/>
+  <path class="guide" d="M 1055 640 V 690"/>
+
+  <rect x="516" y="96" width="248" height="28" rx="14" ry="14" fill="#e2e8f0" opacity="0.9"/>
+  <text class="label" x="541" y="115">Config-driven dependency graph</text>
+</svg>

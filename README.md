@@ -39,6 +39,12 @@
 
 [Project X Official Website](https://xtls.github.io)
 
+### Architecture Overview
+
+![Xray-core architecture overview](docs/architecture.svg)
+
+This diagram gives a high-level view of how Xray-core loads config, builds the core instance, wires features, and moves traffic from inbound handlers through routing to outbound transports.
+
 ## Telegram
 
 [Project X](https://t.me/projectXray)
